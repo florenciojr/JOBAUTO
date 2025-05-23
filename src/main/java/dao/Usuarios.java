@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class usuario {
+public class Usuarios {
     
     // Método para inserir um novo usuário
     public boolean inserirUsuario(Usuario usuario) {

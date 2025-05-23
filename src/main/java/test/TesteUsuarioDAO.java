@@ -1,6 +1,6 @@
 package test;
 
-import dao.usuario;  // Note o nome minúsculo para coincidir com sua classe
+import dao.Usuarios;  // Note o nome minúsculo para coincidir com sua classe
 import model.Usuario;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -10,7 +10,7 @@ public class TesteUsuarioDAO {
 
     public static void main(String[] args) {
         // Instancia o DAO com o nome correto (usuario em minúsculo)
-        usuario usuarioDAO = new usuario();
+        Usuarios usuarioDAO = new Usuarios();
         
         // Formata a data atual para cadastro
         String dataAtual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -20,11 +20,11 @@ public class TesteUsuarioDAO {
         // Teste 1: Inserção
         System.out.println("\n[TESTE 1] Inserir usuário");
         Usuario novoUsuario = new Usuario();
-        novoUsuario.setEmail("teste@exemplo.com");
-        novoUsuario.setSenha("123456");
+        novoUsuario.setEmail("fatima@exemplo.com");
+        novoUsuario.setSenha("1234586");
         novoUsuario.setTipo("CANDIDATO");
         novoUsuario.setNome("Teste Silva");
-        novoUsuario.setTelefone("(21) 98765-4321");
+        novoUsuario.setTelefone("(258) 98765-4321");
         novoUsuario.setDataCadastro(dataAtual);
         novoUsuario.setAtivo(true);
         novoUsuario.setFotoPerfil("avatar.jpg");
