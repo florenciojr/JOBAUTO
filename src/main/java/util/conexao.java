@@ -9,34 +9,41 @@ public class conexao {
     private static final String USER = "root";
     private static final String PASSWORD = "";
     
-    private static Connection conexao = null;
-    
-    public static Connection getConexao() {
-        if (conexao == null) {
-            try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                conexao = DriverManager.getConnection(URL, USER, PASSWORD);
-                System.out.println("Conexão estabelecida com sucesso!");
-            } catch (ClassNotFoundException e) {
-                System.out.println("Driver JDBC não encontrado!");
-                e.printStackTrace();
-            } catch (SQLException e) {
-                System.out.println("Erro ao conectar ao banco de dados!");
-                e.printStackTrace();
-            }
+    static {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            System.err.println("Driver JDBC não encontrado!");
+            throw new RuntimeException("Driver JDBC não encontrado", e);
         }
-        return conexao;
     }
     
-    public static void fecharConexao() {
+    public static Connection getConexao() throws SQLException {
+        return DriverManager.getConnection(
+            URL + "?useSSL=false&autoReconnect=true&connectTimeout=30000&socketTimeout=30000", 
+            USER, 
+            PASSWORD
+        );
+    }
+    
+    public static void fecharConexao(Connection conexao) {
         if (conexao != null) {
             try {
                 conexao.close();
-                conexao = null;
-                System.out.println("Conexão fechada com sucesso!");
             } catch (SQLException e) {
-                System.out.println("Erro ao fechar conexão com o banco de dados!");
-                e.printStackTrace();
+                System.err.println("Erro ao fechar conexão: " + e.getMessage());
+            }
+        }
+    }
+    
+    public static void fecharRecursos(AutoCloseable... recursos) {
+        for (AutoCloseable recurso : recursos) {
+            if (recurso != null) {
+                try {
+                    recurso.close();
+                } catch (Exception e) {
+                    System.err.println("Erro ao fechar recurso: " + e.getMessage());
+                }
             }
         }
     }

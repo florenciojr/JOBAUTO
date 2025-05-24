@@ -67,7 +67,7 @@ public class TesteAssinaturaDAO {
             System.out.println("Status após cancelamento: " + (assinaturaCancelada.isAtiva() ? "Ativa" : "Inativa"));
             
         } finally {
-            assinaturas.fecharConexao();
+           
             System.out.println("\n=== FIM DOS TESTES ===");
         }
     }

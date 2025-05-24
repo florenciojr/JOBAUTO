@@ -60,7 +60,7 @@ public class TestePagamentos {
                 }
             }
         } finally {
-            pagamentos.fecharConexao();
+           
             System.out.println("\n=== FIM DOS TESTES ===");
         }
     }

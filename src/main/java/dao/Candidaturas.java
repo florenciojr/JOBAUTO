@@ -2,25 +2,23 @@ package dao;
 
 import model.Candidatura;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import util.conexao;
 
 public class Candidaturas {
-    private Connection conexao;
-
-    public Candidaturas() {
-        this.conexao = util.conexao.getConexao();
-    }
-
-    // Método para inserir uma nova candidatura
+    
     public boolean inserir(Candidatura candidatura) {
         String sql = "INSERT INTO candidatura (vaga_id, candidato_id, data_candidatura, tipo, status) " +
-                     "VALUES (?, ?, ?, ?, ?)";
+                   "VALUES (?, ?, ?, ?, ?)";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet generatedKeys = null;
         
-        try (PreparedStatement stmt = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try {
+            conn = conexao.getConexao();
+            stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             
-            // Validar os valores ENUM
             String tipo = validarTipo(candidatura.getTipo());
             String status = validarStatus(candidatura.getStatus());
             
@@ -34,10 +32,9 @@ public class Candidaturas {
             int affectedRows = stmt.executeUpdate();
             
             if (affectedRows > 0) {
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        candidatura.setId(generatedKeys.getInt(1));
-                    }
+                generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    candidatura.setId(generatedKeys.getInt(1));
                 }
                 return true;
             }
@@ -46,50 +43,67 @@ public class Candidaturas {
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
             System.err.println("Erro nos dados da candidatura: " + e.getMessage());
+        } finally {
+            conexao.fecharRecursos(generatedKeys, stmt, conn);
         }
         return false;
     }
 
-    // Buscar candidatura por ID
     public Candidatura buscarPorId(int id) {
         String sql = "SELECT * FROM candidatura WHERE id = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
         
-        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try {
+            conn = conexao.getConexao();
+            stmt = conn.prepareStatement(sql);
             stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
             
             if (rs.next()) {
                 return criarCandidaturaAPartirResultSet(rs);
             }
         } catch (SQLException e) {
             System.err.println("Erro ao buscar candidatura por ID: " + e.getMessage());
+        } finally {
+            conexao.fecharRecursos(rs, stmt, conn);
         }
         return null;
     }
 
-    // Listar todas as candidaturas
     public List<Candidatura> listarTodas() {
         String sql = "SELECT * FROM candidatura";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
         List<Candidatura> candidaturas = new ArrayList<>();
         
-        try (PreparedStatement stmt = conexao.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try {
+            conn = conexao.getConexao();
+            stmt = conn.prepareStatement(sql);
+            rs = stmt.executeQuery();
             
             while (rs.next()) {
                 candidaturas.add(criarCandidaturaAPartirResultSet(rs));
             }
         } catch (SQLException e) {
             System.err.println("Erro ao listar candidaturas: " + e.getMessage());
+        } finally {
+            conexao.fecharRecursos(rs, stmt, conn);
         }
         return candidaturas;
     }
 
-    // Atualizar candidatura
     public boolean atualizar(Candidatura candidatura) {
         String sql = "UPDATE candidatura SET vaga_id = ?, candidato_id = ?, data_candidatura = ?, " +
-                     "tipo = ?, status = ? WHERE id = ?";
+                   "tipo = ?, status = ? WHERE id = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
         
-        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try {
+            conn = conexao.getConexao();
+            stmt = conn.prepareStatement(sql);
             
             String tipo = validarTipo(candidatura.getTipo());
             String status = validarStatus(candidatura.getStatus());
@@ -108,61 +122,79 @@ public class Candidaturas {
             System.err.println("Erro ao atualizar candidatura: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             System.err.println("Erro nos dados da candidatura: " + e.getMessage());
+        } finally {
+            conexao.fecharRecursos(stmt, conn);
         }
         return false;
     }
 
-    // Deletar candidatura
     public boolean deletar(int id) {
         String sql = "DELETE FROM candidatura WHERE id = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
         
-        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try {
+            conn = conexao.getConexao();
+            stmt = conn.prepareStatement(sql);
             stmt.setInt(1, id);
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
             System.err.println("Erro ao deletar candidatura: " + e.getMessage());
+        } finally {
+            conexao.fecharRecursos(stmt, conn);
         }
         return false;
     }
 
-    // Buscar candidaturas por vaga
     public List<Candidatura> buscarPorVaga(int vagaId) {
         String sql = "SELECT * FROM candidatura WHERE vaga_id = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
         List<Candidatura> candidaturas = new ArrayList<>();
         
-        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try {
+            conn = conexao.getConexao();
+            stmt = conn.prepareStatement(sql);
             stmt.setInt(1, vagaId);
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
             
             while (rs.next()) {
                 candidaturas.add(criarCandidaturaAPartirResultSet(rs));
             }
         } catch (SQLException e) {
             System.err.println("Erro ao buscar candidaturas por vaga: " + e.getMessage());
+        } finally {
+            conexao.fecharRecursos(rs, stmt, conn);
         }
         return candidaturas;
     }
 
-    // Buscar candidaturas por candidato
     public List<Candidatura> buscarPorCandidato(int candidatoId) {
         String sql = "SELECT * FROM candidatura WHERE candidato_id = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
         List<Candidatura> candidaturas = new ArrayList<>();
         
-        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try {
+            conn = conexao.getConexao();
+            stmt = conn.prepareStatement(sql);
             stmt.setInt(1, candidatoId);
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
             
             while (rs.next()) {
                 candidaturas.add(criarCandidaturaAPartirResultSet(rs));
             }
         } catch (SQLException e) {
             System.err.println("Erro ao buscar candidaturas por candidato: " + e.getMessage());
+        } finally {
+            conexao.fecharRecursos(rs, stmt, conn);
         }
         return candidaturas;
     }
 
-    // Métodos auxiliares
     private String validarTipo(String tipo) {
         if (tipo == null) {
             throw new IllegalArgumentException("Tipo não pode ser nulo");
@@ -194,15 +226,5 @@ public class Candidaturas {
         candidatura.setTipo(rs.getString("tipo"));
         candidatura.setStatus(rs.getString("status"));
         return candidatura;
-    }
-
-    public void fecharConexao() {
-        try {
-            if (conexao != null && !conexao.isClosed()) {
-                conexao.close();
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao fechar conexão: " + e.getMessage());
-        }
     }
 }

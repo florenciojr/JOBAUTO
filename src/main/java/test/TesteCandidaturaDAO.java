@@ -82,7 +82,7 @@ public class TesteCandidaturaDAO {
             }
             
         } finally {
-            candidaturas.fecharConexao();
+            
             System.out.println("\n=== FIM DOS TESTES ===");
         }
     }

@@ -1,24 +1,23 @@
 package dao;
 
-
 import model.Pagamento;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import util.conexao;
 
 public class Pagamentos {
-    private Connection conexao;
-
-    public Pagamentos() {
-        this.conexao = util.conexao.getConexao();
-    }
-
-    // Método para inserir um novo pagamento
+    
     public boolean inserir(Pagamento pagamento) {
         String sql = "INSERT INTO pagamento (usuario_id, valor, data_pagamento, metodo, status, descricao) " +
-                     "VALUES (?, ?, ?, ?, ?, ?)";
+                   "VALUES (?, ?, ?, ?, ?, ?)";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet generatedKeys = null;
         
-        try (PreparedStatement stmt = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try {
+            conn = conexao.getConexao();
+            stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             
             stmt.setInt(1, pagamento.getUsuarioId());
             stmt.setDouble(2, pagamento.getValor());
@@ -30,60 +29,76 @@ public class Pagamentos {
             int affectedRows = stmt.executeUpdate();
             
             if (affectedRows > 0) {
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        pagamento.setId(generatedKeys.getInt(1));
-                    }
+                generatedKeys = stmt.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    pagamento.setId(generatedKeys.getInt(1));
                 }
                 return true;
             }
         } catch (SQLException e) {
             System.err.println("Erro ao inserir pagamento: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            conexao.fecharRecursos(generatedKeys, stmt, conn);
         }
         return false;
     }
 
-    // Método para buscar pagamento por ID
     public Pagamento buscarPorId(int id) {
         String sql = "SELECT * FROM pagamento WHERE id = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
         
-        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try {
+            conn = conexao.getConexao();
+            stmt = conn.prepareStatement(sql);
             stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
             
             if (rs.next()) {
                 return criarPagamentoAPartirResultSet(rs);
             }
         } catch (SQLException e) {
             System.err.println("Erro ao buscar pagamento por ID: " + e.getMessage());
+        } finally {
+            conexao.fecharRecursos(rs, stmt, conn);
         }
         return null;
     }
 
-    // Método para listar todos os pagamentos
     public List<Pagamento> listarTodos() {
         String sql = "SELECT * FROM pagamento";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
         List<Pagamento> pagamentos = new ArrayList<>();
         
-        try (PreparedStatement stmt = conexao.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try {
+            conn = conexao.getConexao();
+            stmt = conn.prepareStatement(sql);
+            rs = stmt.executeQuery();
             
             while (rs.next()) {
                 pagamentos.add(criarPagamentoAPartirResultSet(rs));
             }
         } catch (SQLException e) {
             System.err.println("Erro ao listar pagamentos: " + e.getMessage());
+        } finally {
+            conexao.fecharRecursos(rs, stmt, conn);
         }
         return pagamentos;
     }
 
-    // Método para atualizar um pagamento
     public boolean atualizar(Pagamento pagamento) {
         String sql = "UPDATE pagamento SET usuario_id = ?, valor = ?, data_pagamento = ?, " +
                      "metodo = ?, status = ?, descricao = ? WHERE id = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
         
-        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try {
+            conn = conexao.getConexao();
+            stmt = conn.prepareStatement(sql);
             
             stmt.setInt(1, pagamento.getUsuarioId());
             stmt.setDouble(2, pagamento.getValor());
@@ -97,61 +112,79 @@ public class Pagamentos {
             return affectedRows > 0;
         } catch (SQLException e) {
             System.err.println("Erro ao atualizar pagamento: " + e.getMessage());
+        } finally {
+            conexao.fecharRecursos(stmt, conn);
         }
         return false;
     }
 
-    // Método para deletar um pagamento
     public boolean deletar(int id) {
         String sql = "DELETE FROM pagamento WHERE id = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
         
-        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try {
+            conn = conexao.getConexao();
+            stmt = conn.prepareStatement(sql);
             stmt.setInt(1, id);
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
             System.err.println("Erro ao deletar pagamento: " + e.getMessage());
+        } finally {
+            conexao.fecharRecursos(stmt, conn);
         }
         return false;
     }
 
-    // Método para buscar pagamentos por usuário
     public List<Pagamento> buscarPorUsuario(int usuarioId) {
         String sql = "SELECT * FROM pagamento WHERE usuario_id = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
         List<Pagamento> pagamentos = new ArrayList<>();
         
-        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try {
+            conn = conexao.getConexao();
+            stmt = conn.prepareStatement(sql);
             stmt.setInt(1, usuarioId);
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
             
             while (rs.next()) {
                 pagamentos.add(criarPagamentoAPartirResultSet(rs));
             }
         } catch (SQLException e) {
             System.err.println("Erro ao buscar pagamentos por usuário: " + e.getMessage());
+        } finally {
+            conexao.fecharRecursos(rs, stmt, conn);
         }
         return pagamentos;
     }
 
-    // Método para buscar pagamentos por status
     public List<Pagamento> buscarPorStatus(String status) {
         String sql = "SELECT * FROM pagamento WHERE status = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
         List<Pagamento> pagamentos = new ArrayList<>();
         
-        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+        try {
+            conn = conexao.getConexao();
+            stmt = conn.prepareStatement(sql);
             stmt.setString(1, status);
-            ResultSet rs = stmt.executeQuery();
+            rs = stmt.executeQuery();
             
             while (rs.next()) {
                 pagamentos.add(criarPagamentoAPartirResultSet(rs));
             }
         } catch (SQLException e) {
             System.err.println("Erro ao buscar pagamentos por status: " + e.getMessage());
+        } finally {
+            conexao.fecharRecursos(rs, stmt, conn);
         }
         return pagamentos;
     }
 
-    // Método auxiliar para criar objeto Pagamento a partir do ResultSet
     private Pagamento criarPagamentoAPartirResultSet(ResultSet rs) throws SQLException {
         Pagamento pagamento = new Pagamento();
         pagamento.setId(rs.getInt("id"));
@@ -162,15 +195,5 @@ public class Pagamentos {
         pagamento.setStatus(rs.getString("status"));
         pagamento.setDescricao(rs.getString("descricao"));
         return pagamento;
-    }
-
-    public void fecharConexao() {
-        try {
-            if (conexao != null && !conexao.isClosed()) {
-                conexao.close();
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao fechar conexão: " + e.getMessage());
-        }
     }
 }

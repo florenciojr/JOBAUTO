@@ -1,71 +1,63 @@
 package test;
 
-import dao.Usuarios;  // Note o nome minúsculo para coincidir com sua classe
+import dao.Usuarios;
 import model.Usuario;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class TesteUsuarioDAO {
-
     public static void main(String[] args) {
-        // Instancia o DAO com o nome correto (usuario em minúsculo)
         Usuarios usuarioDAO = new Usuarios();
         
-        // Formata a data atual para cadastro
-        String dataAtual = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        System.out.println("=== TESTE CRUD USUÁRIO ===");
         
-        System.out.println("=== TESTE DA CLASSE usuario (DAO) ===");
-        
-        // Teste 1: Inserção
-        System.out.println("\n[TESTE 1] Inserir usuário");
+        // Teste de criação (CREATE)
+        System.out.println("\n--- Teste CREATE ---");
         Usuario novoUsuario = new Usuario();
-        novoUsuario.setEmail("fatima@exemplo.com");
-        novoUsuario.setSenha("1234586");
+        novoUsuario.setNome("João Teste");
+        novoUsuario.setEmail("joao@teste.com");
+        novoUsuario.setSenha("123456");
         novoUsuario.setTipo("CANDIDATO");
-        novoUsuario.setNome("Teste Silva");
-        novoUsuario.setTelefone("(258) 98765-4321");
-        novoUsuario.setDataCadastro(dataAtual);
+        novoUsuario.setTelefone("(11) 99999-9999");
+        novoUsuario.setDataCadastro("2023-05-25");
         novoUsuario.setAtivo(true);
-        novoUsuario.setFotoPerfil("avatar.jpg");
-
-        if (usuarioDAO.inserirUsuario(novoUsuario)) {
-            System.out.println("✔ Inserção OK - ID gerado: " + novoUsuario.getId());
-            
-            // Teste 2: Busca por ID
-            System.out.println("\n[TESTE 2] Busca por ID");
-            Usuario usuarioRecuperado = usuarioDAO.buscarPorId(novoUsuario.getId());
-            
-            if (usuarioRecuperado != null) {
-                System.out.println("✔ Usuário encontrado: " + usuarioRecuperado.getNome());
-                
-                // Teste 3: Atualização
-                System.out.println("\n[TESTE 3] Atualização");
-                usuarioRecuperado.setNome("Nome Alterado");
-                if (usuarioDAO.atualizarUsuario(usuarioRecuperado)) {
-                    System.out.println("✔ Atualização OK");
-                } else {
-                    System.out.println("✖ Falha na atualização");
-                }
-                
-                // Teste 4: Busca por Email
-                System.out.println("\n[TESTE 4] Busca por Email");
-                Usuario porEmail = usuarioDAO.buscarPorEmail(novoUsuario.getEmail());
-                System.out.println(porEmail != null ? "✔ Usuário encontrado" : "✖ Usuário não encontrado");
-                
-                // Teste 5: Listagem
-                System.out.println("\n[TESTE 5] Listar Todos");
-                List<Usuario> usuarios = usuarioDAO.listarTodos();
-                System.out.println("Total de usuários: " + usuarios.size());
-                
+        novoUsuario.setFotoPerfil("uploads/foto.jpg");
         
-            } else {
-                System.out.println("✖ Usuário não encontrado após inserção");
-            }
-        } else {
-            System.out.println("✖ Falha na inserção do usuário");
+        boolean criado = usuarioDAO.inserirUsuario(novoUsuario);
+        System.out.println("Usuário criado? " + criado);
+        System.out.println("ID do novo usuário: " + novoUsuario.getId());
+        
+        // Teste de leitura (READ)
+        System.out.println("\n--- Teste READ ---");
+        Usuario usuarioRecuperado = usuarioDAO.buscarPorId(novoUsuario.getId());
+        System.out.println("Usuário recuperado: " + usuarioRecuperado.getNome());
+        
+        // Teste de listagem
+        System.out.println("\n--- Listar todos ---");
+        List<Usuario> usuarios = usuarioDAO.listarTodos();
+        for (Usuario u : usuarios) {
+            System.out.println(u.getId() + " - " + u.getNome() + " - " + u.getEmail());
         }
         
-        System.out.println("\n=== FIM DOS TESTES ===");
+        // Teste de atualização (UPDATE)
+        System.out.println("\n--- Teste UPDATE ---");
+        usuarioRecuperado.setNome("João Atualizado");
+        usuarioRecuperado.setTelefone("(11) 98888-8888");
+        boolean atualizado = usuarioDAO.atualizarUsuario(usuarioRecuperado);
+        System.out.println("Usuário atualizado? " + atualizado);
+        
+        // Verificar atualização
+        Usuario usuarioAtualizado = usuarioDAO.buscarPorId(usuarioRecuperado.getId());
+        System.out.println("Nome após atualização: " + usuarioAtualizado.getNome());
+        System.out.println("Telefone após atualização: " + usuarioAtualizado.getTelefone());
+        
+  
+        // Verificar exclusão
+        Usuario usuarioDeletado = usuarioDAO.buscarPorId(usuarioAtualizado.getId());
+        System.out.println("Usuário ainda existe? " + (usuarioDeletado != null));
+        
+        // Teste buscar por email
+        System.out.println("\n--- Teste buscar por email ---");
+        Usuario usuarioEmail = usuarioDAO.buscarPorEmail("joao@teste.com");
+        System.out.println("Usuário por email: " + (usuarioEmail != null ? usuarioEmail.getNome() : "Não encontrado"));
     }
 }
