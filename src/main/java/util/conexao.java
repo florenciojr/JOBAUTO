@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class conexao {
-    private static final String URL = "jdbc:mysql://localhost:3306/jobauto";
+    private static final String URL = "jdbc:mysql://localhost:3306/jobauto?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true";
     private static final String USER = "root";
     private static final String PASSWORD = "";
     

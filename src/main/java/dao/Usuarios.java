@@ -202,4 +202,33 @@ public class Usuarios {
         }
         return usuario;
     }
+    
+    public List<Usuario> buscarPorTipo(String tipo) {
+        String sql = "SELECT id, nome, email, telefone FROM usuario WHERE tipo = ?";
+        List<Usuario> usuarios = new ArrayList<>();
+        
+        try (Connection conexao = util.conexao.getConexao();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            
+            stmt.setString(1, tipo);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Usuario usuario = new Usuario();
+                    usuario.setId(rs.getInt("id"));
+                    usuario.setNome(rs.getString("nome"));
+                    usuario.setEmail(rs.getString("email"));
+                    usuario.setTelefone(rs.getString("telefone"));
+                    usuario.setTipo(tipo); // Já sabemos que é do tipo solicitado
+                    
+                    usuarios.add(usuario);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar usuários por tipo '" + tipo + "': " + e.getMessage());
+            throw new RuntimeException("Erro no banco de dados", e);
+        }
+        
+        return usuarios;
+    }
 }
