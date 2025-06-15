@@ -14,7 +14,7 @@ public class TesteUsuarioDAO {
         System.out.println("\n--- Teste CREATE ---");
         Usuario novoUsuario = new Usuario();
         novoUsuario.setNome("João Teste");
-        novoUsuario.setEmail("joao@teste.com");
+        novoUsuario.setEmail("joao@testeettt.com");
         novoUsuario.setSenha("123456");
         novoUsuario.setTipo("CANDIDATO");
         novoUsuario.setTelefone("(11) 99999-9999");
@@ -40,7 +40,7 @@ public class TesteUsuarioDAO {
         
         // Teste de atualização (UPDATE)
         System.out.println("\n--- Teste UPDATE ---");
-        usuarioRecuperado.setNome("João Atualizado");
+        usuarioRecuperado.setNome("João Atualizado11111");
         usuarioRecuperado.setTelefone("(11) 98888-8888");
         boolean atualizado = usuarioDAO.atualizarUsuario(usuarioRecuperado);
         System.out.println("Usuário atualizado? " + atualizado);

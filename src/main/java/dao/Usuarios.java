@@ -9,46 +9,57 @@ import util.conexao;
 public class Usuarios {
     
 	public boolean inserirUsuario(Usuario usuario) {
-	    String sql = "INSERT INTO usuario (email, senha, tipo, nome, telefone, data_cadastro, ativo, foto_perfil) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-	    Connection conn = null;
-	    PreparedStatement stmt = null;
-	    ResultSet generatedKeys = null;
-	    
-	    try {
-	        conn = conexao.getConexao();
-	        stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-	        
-	        stmt.setString(1, usuario.getEmail());
-	        stmt.setString(2, usuario.getSenha());
-	        stmt.setString(3, usuario.getTipo());
-	        stmt.setString(4, usuario.getNome());
-	        stmt.setString(5, usuario.getTelefone());
-	        
-	        // Formato de data compatível com MySQL (YYYY-MM-DD HH:MM:SS)
-	        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	        String dataFormatada = sdf.format(new java.util.Date());
-	        stmt.setString(6, dataFormatada);
-	        
-	        stmt.setBoolean(7, usuario.isAtivo());
-	        stmt.setString(8, usuario.getFotoPerfil());
-	        
-	        int affectedRows = stmt.executeUpdate();
-	        
-	        if (affectedRows > 0) {
-	            generatedKeys = stmt.getGeneratedKeys();
-	            if (generatedKeys.next()) {
-	                usuario.setId(generatedKeys.getInt(1));
-	            }
-	            return true;
-	        }
-	    } catch (SQLException e) {
-	        System.err.println("Erro ao inserir usuário: " + e.getMessage());
-	        e.printStackTrace();
-	    } finally {
-	        conexao.fecharRecursos(generatedKeys, stmt, conn);
-	    }
-	    return false;
-	}
+    String sql = "INSERT INTO usuario (email, senha, tipo, nome, telefone, data_cadastro, ativo, foto_perfil) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    ResultSet generatedKeys = null;
+    
+    try {
+        conn = conexao.getConexao();
+        stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        
+        stmt.setString(1, usuario.getEmail());
+        stmt.setString(2, usuario.getSenha());
+        stmt.setString(3, usuario.getTipo());
+        stmt.setString(4, usuario.getNome());
+        stmt.setString(5, usuario.getTelefone());
+        
+        // Formato de data compatível com MySQL (YYYY-MM-DD HH:MM:SS)
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dataFormatada = sdf.format(new java.util.Date());
+        stmt.setString(6, dataFormatada);
+        
+        stmt.setBoolean(7, usuario.isAtivo());
+        stmt.setString(8, usuario.getFotoPerfil());
+        
+        int affectedRows = stmt.executeUpdate();
+        
+        if (affectedRows > 0) {
+            generatedKeys = stmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                usuario.setId(generatedKeys.getInt(1));
+            }
+            return true;
+        }
+        return false;
+    } catch (SQLException e) {
+        // Lança RuntimeException como esperado nos testes
+        throw new RuntimeException("Erro ao inserir usuário: " + e.getMessage(), e);
+    } finally {
+        try {
+            if (generatedKeys != null) generatedKeys.close();
+            if (stmt != null) stmt.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            System.err.println("Erro ao fechar recursos: " + e.getMessage());
+        }
+    }
+}
+        
+        
+        
+        
+        
     
     public Usuario buscarPorId(int id) {
         String sql = "SELECT * FROM usuario WHERE id = ?";
