@@ -242,4 +242,42 @@ public class Usuarios {
         
         return usuarios;
     }
+    
+    
+    public Usuario autenticarUsuario(String email, String senha) {
+    String sql = "SELECT * FROM usuario WHERE email = ? AND senha = ? AND ativo = true";
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    ResultSet rs = null;
+    Usuario usuario = null;
+    
+    try {
+        conn = conexao.getConexao();
+        stmt = conn.prepareStatement(sql);
+        stmt.setString(1, email);
+        stmt.setString(2, senha);
+        rs = stmt.executeQuery();
+        
+        if (rs.next()) {
+            usuario = new Usuario();
+            usuario.setId(rs.getInt("id"));
+            usuario.setEmail(rs.getString("email"));
+            usuario.setSenha(rs.getString("senha"));
+            usuario.setTipo(rs.getString("tipo"));
+            usuario.setNome(rs.getString("nome"));
+            usuario.setTelefone(rs.getString("telefone"));
+            usuario.setDataCadastro(rs.getString("data_cadastro"));
+            usuario.setAtivo(rs.getBoolean("ativo"));
+            usuario.setFotoPerfil(rs.getString("foto_perfil"));
+        }
+    } catch (SQLException e) {
+        System.err.println("Erro ao autenticar usuário: " + e.getMessage());
+        e.printStackTrace();
+    } finally {
+        conexao.fecharRecursos(rs, stmt, conn);
+    }
+    return usuario;
+}
+    
+    
 }
