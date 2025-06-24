@@ -13,8 +13,8 @@ public class TesteUsuarioDAO {
         // Teste de criação (CREATE)
         System.out.println("\n--- Teste CREATE ---");
         Usuario novoUsuario = new Usuario();
-        novoUsuario.setNome("João Teste");
-        novoUsuario.setEmail("joao@testeettt.com");
+        novoUsuario.setNome("floras");
+        novoUsuario.setEmail("wilsona@gmail.com");
         novoUsuario.setSenha("123456");
         novoUsuario.setTipo("CANDIDATO");
         novoUsuario.setTelefone("(11) 99999-9999");
@@ -38,12 +38,12 @@ public class TesteUsuarioDAO {
             System.out.println(u.getId() + " - " + u.getNome() + " - " + u.getEmail());
         }
         
-        // Teste de atualização (UPDATE)
-        System.out.println("\n--- Teste UPDATE ---");
-        usuarioRecuperado.setNome("João Atualizado11111");
-        usuarioRecuperado.setTelefone("(11) 98888-8888");
-        boolean atualizado = usuarioDAO.atualizarUsuario(usuarioRecuperado);
-        System.out.println("Usuário atualizado? " + atualizado);
+//         Teste de atualização (UPDATE)
+//        System.out.println("\n--- Teste UPDATE ---");
+//        usuarioRecuperado.setNome("João Atualizado11111");
+//        usuarioRecuperado.setTelefone("(11) 98888-8888");
+//        boolean atualizado = usuarioDAO.atualizarUsuario(usuarioRecuperado);
+//        System.out.println("Usuário atualizado? " + atualizado);
         
         // Verificar atualização
         Usuario usuarioAtualizado = usuarioDAO.buscarPorId(usuarioRecuperado.getId());

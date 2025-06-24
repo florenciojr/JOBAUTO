@@ -1,62 +1,65 @@
 package test;
 
-import model.Vaga;
 import dao.Vagas;
+import model.Vaga;
 import java.util.List;
 
-public class TesteVagasDAO {
+public class TesteVagasDAO{
     public static void main(String[] args) {
-        Vagas vagas = new Vagas();
-        
-        // Teste de inserção
-        Vaga vaga1 = new Vaga();
-        vaga1.setEmpresaId(1);
-        vaga1.setTitulo("Desenvolvedor Java Pleno");
-        vaga1.setDescricao("Vaga para desenvolvedor Java com experiência em Spring Boot");
-        vaga1.setRequisitos("Java, Spring Boot, SQL, Git");
-        vaga1.setBeneficios("VT, VR, Plano de Saúde");
-        vaga1.setSalario("R$ 8.000,00");
-        vaga1.setTipoContrato("CLT");
-        vaga1.setModalidade("Híbrido");
-        vaga1.setLocalizacao("São Paulo/SP");
-        vaga1.setDataPublicacao("2023-10-01 00:00:00");
-        vaga1.setStatus("ABERTA");
-        vaga1.setValorRecrutamento(1500.00);
-        
-        boolean inserida = vagas.inserir(vaga1);
-        System.out.println("Vaga inserida: " + inserida);
-        
-        if (inserida) {
-            System.out.println("ID gerado: " + vaga1.getId());
-            
-            // Teste de busca por ID
-            Vaga vagaBuscada = vagas.buscarPorId(vaga1.getId());
-            if (vagaBuscada != null) {
-                System.out.println("\nVaga encontrada:");
-                System.out.println("Título: " + vagaBuscada.getTitulo());
-                System.out.println("Status: " + vagaBuscada.getStatus());
-                
-                // Teste de atualização
-                vagaBuscada.setStatus("PAUSADA");
-                boolean atualizada = vagas.atualizar(vagaBuscada);
-                System.out.println("\nVaga atualizada: " + atualizada);
-                
-                // Teste de listagem
-                System.out.println("\nTodas as vagas:");
-                List<Vaga> todasVagas = vagas.listarTodas();
-                for (Vaga v : todasVagas) {
-                    System.out.println(v.getId() + " - " + v.getTitulo() + " (" + v.getStatus() + ")");
-                }
-                
-                // Teste de busca por título
-                System.out.println("\nBusca por 'Java':");
-                List<Vaga> vagasJava = vagas.buscarPorTitulo("Java");
-                for (Vaga v : vagasJava) {
-                    System.out.println(v.getTitulo() + " - " + v.getModalidade());
-                }
-                
-             
-            }
+        Vagas vagasDao = new Vagas();
+
+        // 1. Inserir uma nova vaga
+        Vaga novaVaga = new Vaga();
+        novaVaga.setEmpresaId(1);  // Use um id de empresa válido da sua base
+        novaVaga.setTitulo("Analista de Sistemas");
+        novaVaga.setDescricao("Descrição da vaga de Analista de Sistemas.");
+        novaVaga.setRequisitos("Requisitos necessários...");
+        novaVaga.setBeneficios("Vale transporte, VR");
+        novaVaga.setSalario("1500.00");
+        novaVaga.setTipoContrato("CLT");
+        novaVaga.setModalidade("Presencial");
+        novaVaga.setLocalizacao("Maputo");
+        novaVaga.setDataPublicacao("2025-06-23 10:00:00");
+        novaVaga.setDataEncerramento("2025-07-23 23:59:59");
+        novaVaga.setStatus("ABERTA");
+        novaVaga.setValorRecrutamento(500.0);
+
+        boolean inseriu = vagasDao.inserir(novaVaga);
+        System.out.println("Inserção da vaga: " + (inseriu ? "SUCESSO" : "FALHA"));
+        System.out.println("ID gerado: " + novaVaga.getId());
+
+        // 2. Listar todas as vagas (com nome da empresa)
+        List<Vaga> todasVagas = vagasDao.listarTodas();
+        System.out.println("\nLista de todas as vagas:");
+        for (Vaga v : todasVagas) {
+            System.out.println(v.getId() + ": " + v.getTitulo() + " | Empresa: " + v.getNomeEmpresa());
         }
+
+        // 3. Buscar vaga por ID
+        int idBusca = novaVaga.getId();
+        Vaga vagaBuscada = vagasDao.buscarPorId(idBusca);
+        if (vagaBuscada != null) {
+            System.out.println("\nVaga buscada pelo ID " + idBusca + ": " + vagaBuscada.getTitulo());
+        } else {
+            System.out.println("\nVaga com ID " + idBusca + " não encontrada.");
+        }
+
+        // 4. Atualizar a vaga
+        if (vagaBuscada != null) {
+            vagaBuscada.setTitulo("Analista de Sistemas Sênior");
+            boolean atualizou = vagasDao.atualizar(vagaBuscada);
+            System.out.println("Atualização da vaga: " + (atualizou ? "SUCESSO" : "FALHA"));
+        }
+
+        // 5. Listar vagas ativas
+        List<Vaga> vagasAtivas = vagasDao.buscarAtivas();
+        System.out.println("\nVagas ativas:");
+        for (Vaga v : vagasAtivas) {
+            System.out.println(v.getId() + ": " + v.getTitulo() + " | Empresa: " + v.getNomeEmpresa());
+        }
+
+        // 6. Deletar a vaga criada (opcional)
+        boolean deletou = vagasDao.deletar(novaVaga.getId());
+        System.out.println("\nDeletar vaga ID " + novaVaga.getId() + ": " + (deletou ? "SUCESSO" : "FALHA"));
     }
 }

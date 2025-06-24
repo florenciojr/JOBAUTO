@@ -16,7 +16,8 @@ public class Vaga {
     private String status;
     private double valorRecrutamento;
 
-    public Vaga() {}
+    // ⚠️ Esse campo abaixo é essencial para mostrar o nome da empresa no JSP
+    private String nomeEmpresa;
 
     // Getters e Setters
     public int getId() { return id; }
@@ -60,4 +61,8 @@ public class Vaga {
 
     public double getValorRecrutamento() { return valorRecrutamento; }
     public void setValorRecrutamento(double valorRecrutamento) { this.valorRecrutamento = valorRecrutamento; }
+
+    // Getter e Setter da empresa (opcional para exibição)
+    public String getNomeEmpresa() { return nomeEmpresa; }
+    public void setNomeEmpresa(String nomeEmpresa) { this.nomeEmpresa = nomeEmpresa; }
 }

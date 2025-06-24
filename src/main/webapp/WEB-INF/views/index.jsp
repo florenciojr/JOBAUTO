@@ -253,7 +253,7 @@
                 <c:choose>
                     <c:when test="${usuarioLogado.tipo == 'CANDIDATO'}">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#">
+                            <a class="nav-link active" href="<c:url value='/dashboard'/>">
                                 <i class="bi bi-speedometer2"></i> Dashboard
                             </a>
                         </li>
@@ -263,39 +263,39 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<c:url value='/minhas-candidaturas'/>">
+                            <a class="nav-link" href="<c:url value='/candidaturas?action=byCandidato&candidatoId=${usuarioLogado.id}'/>">
                                 <i class="bi bi-file-earmark-text-fill"></i> Minhas Candidaturas
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<c:url value='/meu-perfil'/>">
+                            <a class="nav-link" href="<c:url value='/perfil-candidato?action=detalhes&usuarioId=${usuarioLogado.id}'/>">
                                 <i class="bi bi-person-fill"></i> Meu Perfil
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<c:url value='/meu-plano'/>">
+                            <a class="nav-link" href="<c:url value='/plano'/>">
                                 <i class="bi bi-credit-card-fill"></i> Meu Plano
                             </a>
                         </li>
                     </c:when>
                     <c:when test="${usuarioLogado.tipo == 'EMPRESA'}">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#">
+                            <a class="nav-link active" href="<c:url value='/dashboard'/>">
                                 <i class="bi bi-speedometer2"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<c:url value='/minhas-vagas'/>">
+                            <a class="nav-link" href="<c:url value='/vagas?action=byEmpresa&empresaId=${usuarioLogado.id}'/>">
                                 <i class="bi bi-briefcase-fill"></i> Minhas Vagas
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<c:url value='/candidatos'/>">
+                            <a class="nav-link" href="<c:url value='/candidaturas?action=byEmpresa&empresaId=${usuarioLogado.id}'/>">
                                 <i class="bi bi-people-fill"></i> Candidatos
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<c:url value='/nova-vaga'/>">
+                            <a class="nav-link" href="<c:url value='/vagas?action=new'/>">
                                 <i class="bi bi-plus-circle-fill"></i> Publicar Vaga
                             </a>
                         </li>
@@ -307,12 +307,12 @@
                     </c:when>
                     <c:when test="${usuarioLogado.tipo == 'ADMIN'}">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#">
+                            <a class="nav-link active" href="<c:url value='/dashboard'/>">
                                 <i class="bi bi-speedometer2"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<c:url value='/usuarios'/>">
+                            <a class="nav-link" href="<c:url value='/usuario?action=listar'/>">
                                 <i class="bi bi-people-fill"></i> Usuários
                             </a>
                         </li>
@@ -357,9 +357,9 @@
                 <div class="dropdown">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
                        <c:choose>
-                            <c:when test="${not empty usuario.fotoPerfil}">
-                                <img src="${pageContext.request.contextPath}/${usuario.fotoPerfil}" 
-                                     alt="Foto de ${usuario.nome}" class="profile-img me-1">
+                            <c:when test="${not empty usuarioLogado.fotoPerfil}">
+                                <img src="<c:url value='/${usuarioLogado.fotoPerfil}'/>" 
+                                     alt="Foto de ${usuarioLogado.nome}" class="profile-img me-1">
                             </c:when>
                             <c:otherwise>
                                 <div class="profile-img bg-secondary text-white d-flex align-items-center justify-content-center me-1">
@@ -370,13 +370,28 @@
                         <span class="d-none d-sm-inline">${usuarioLogado.nome}</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="<c:url value='/perfil'/>"><i class="bi bi-person me-2"></i>Perfil</a></li>
+                        <li><a class="dropdown-item" href="<c:url value='/usuario?action=editar&id=${usuarioLogado.id}'/>"><i class="bi bi-person me-2"></i>Perfil</a></li>
                         <li><a class="dropdown-item" href="<c:url value='/configuracoes'/>"><i class="bi bi-gear me-2"></i>Configurações</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="<c:url value='/logout'/>"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
                     </ul>
                 </div>
             </div>
+
+            <!-- Mensagens de sucesso/erro -->
+            <c:if test="${not empty mensagemSucesso}">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    ${mensagemSucesso}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </c:if>
+            
+            <c:if test="${not empty mensagemErro}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    ${mensagemErro}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </c:if>
 
             <!-- Dashboard Content Based on User Type -->
             <c:choose>
@@ -455,7 +470,7 @@
                             <div class="card h-100">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0">Últimas Candidaturas</h5>
-                                    <a href="<c:url value='/minhas-candidaturas'/>" class="btn btn-sm btn-outline-primary">Ver Todas</a>
+                                    <a href="<c:url value='/candidaturas?action=byCandidato&candidatoId=${usuarioLogado.id}'/>" class="btn btn-sm btn-outline-primary">Ver Todas</a>
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -474,7 +489,7 @@
                                                     <tr>
                                                         <td>${candidatura.vaga.titulo}</td>
                                                         <td>${candidatura.vaga.empresa.nome}</td>
-                                                        <td>${candidatura.dataFormatada}</td>
+                                                        <td>${candidatura.dataCandidatura}</td>
                                                         <td>
                                                             <span class="badge 
                                                                 <c:choose>
@@ -488,7 +503,7 @@
                                                             </span>
                                                         </td>
                                                         <td>
-                                                            <a href="<c:url value='/vaga/detalhes?id=${candidatura.vaga.id}'/>" class="btn btn-sm btn-outline-primary">
+                                                            <a href="<c:url value='/candidaturas?action=edit&id=${candidatura.id}'/>" class="btn btn-sm btn-outline-primary">
                                                                 <i class="bi bi-eye"></i>
                                                             </a>
                                                         </td>
@@ -514,8 +529,8 @@
                                             <p class="small mb-1">${vaga.empresa.nome}</p>
                                             <p class="small text-muted mb-1">${vaga.localizacao}</p>
                                             <div class="d-flex justify-content-between">
-                                                <span class="badge bg-primary">${vaga.tipo_contrato}</span>
-                                                <a href="<c:url value='/vaga/detalhes?id=${vaga.id}'/>" class="btn btn-sm btn-outline-primary">Candidatar</a>
+                                                <span class="badge bg-primary">${vaga.tipoContrato}</span>
+                                                <a href="<c:url value='/candidaturas?action=new&vagaId=${vaga.id}'/>" class="btn btn-sm btn-outline-primary">Candidatar</a>
                                             </div>
                                         </div>
                                     </c:forEach>
@@ -562,7 +577,7 @@
                                         </div>
                                     </div>
                                     <div class="text-center mt-3">
-                                        <a href="<c:url value='/meu-perfil'/>" class="btn btn-primary">Completar Perfil</a>
+                                        <a href="<c:url value='/perfil-candidato?action=editar&usuarioId=${usuarioLogado.id}'/>" class="btn btn-primary">Completar Perfil</a>
                                     </div>
                                 </div>
                             </div>
@@ -657,7 +672,7 @@
                             <div class="card h-100">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0">Últimas Candidaturas</h5>
-                                    <a href="<c:url value='/candidaturas'/>" class="btn btn-sm btn-outline-primary">Ver Todas</a>
+                                    <a href="<c:url value='/candidaturas?action=byEmpresa&empresaId=${usuarioLogado.id}'/>" class="btn btn-sm btn-outline-primary">Ver Todas</a>
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -677,8 +692,8 @@
                                                         <td>
                                                             <div class="d-flex align-items-center">
                                                                 <c:choose>
-                                                                    <c:when test="${not empty candidatura.candidato.foto_perfil}">
-                                                                        <img src="<c:url value='${candidatura.candidato.foto_perfil}'/>" alt="User" class="user-profile-img me-2">
+                                                                    <c:when test="${not empty candidatura.candidato.fotoPerfil}">
+                                                                        <img src="<c:url value='/${candidatura.candidato.fotoPerfil}'/>" alt="User" class="user-profile-img me-2">
                                                                     </c:when>
                                                                     <c:otherwise>
                                                                         <div class="user-profile-img bg-primary text-white d-flex align-items-center justify-content-center me-2">
@@ -690,7 +705,7 @@
                                                             </div>
                                                         </td>
                                                         <td>${candidatura.vaga.titulo}</td>
-                                                        <td>${candidatura.dataFormatada}</td>
+                                                        <td>${candidatura.dataCandidatura}</td>
                                                         <td>
                                                             <span class="badge 
                                                                 <c:choose>
@@ -704,9 +719,19 @@
                                                             </span>
                                                         </td>
                                                         <td>
-                                                            <a href="<c:url value='/candidatura/detalhes?id=${candidatura.id}'/>" class="btn btn-sm btn-outline-primary">
-                                                                <i class="bi bi-eye"></i>
-                                                            </a>
+                                                            <div class="btn-group">
+                                                                <a href="<c:url value='/candidaturas?action=edit&id=${candidatura.id}'/>" class="btn btn-sm btn-outline-primary">
+                                                                    <i class="bi bi-eye"></i>
+                                                                </a>
+                                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                                    <i class="bi bi-gear"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu">
+                                                                    <li><a class="dropdown-item" href="<c:url value='/candidaturas?action=updateStatus&id=${candidatura.id}&status=ENTREVISTA'/>">Marcar para Entrevista</a></li>
+                                                                    <li><a class="dropdown-item" href="<c:url value='/candidaturas?action=updateStatus&id=${candidatura.id}&status=CONTRATADO'/>">Contratar</a></li>
+                                                                    <li><a class="dropdown-item" href="<c:url value='/candidaturas?action=updateStatus&id=${candidatura.id}&status=REJEITADA'/>">Rejeitar</a></li>
+                                                                </ul>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 </c:forEach>
@@ -729,12 +754,12 @@
                                             <h6>${vaga.titulo}</h6>
                                             <p class="small mb-1">${vaga.localizacao}</p>
                                             <div class="d-flex justify-content-between align-items-center">
-                                                <span class="badge bg-primary">${vaga.candidaturas} candidatos</span>
+                                                <span class="badge bg-primary">${vaga.totalCandidaturas} candidatos</span>
                                                 <div>
-                                                    <a href="<c:url value='/vaga/editar?id=${vaga.id}'/>" class="btn btn-sm btn-outline-secondary">
+                                                    <a href="<c:url value='/vagas?action=edit&id=${vaga.id}'/>" class="btn btn-sm btn-outline-secondary">
                                                         <i class="bi bi-pencil"></i>
                                                     </a>
-                                                    <a href="<c:url value='/vaga/detalhes?id=${vaga.id}'/>" class="btn btn-sm btn-outline-primary">
+                                                    <a href="<c:url value='/vagas?action=view&id=${vaga.id}'/>" class="btn btn-sm btn-outline-primary">
                                                         <i class="bi bi-eye"></i>
                                                     </a>
                                                 </div>
@@ -742,38 +767,9 @@
                                         </div>
                                     </c:forEach>
                                     <div class="text-center mt-2">
-                                        <a href="<c:url value='/nova-vaga'/>" class="btn btn-primary btn-sm">
+                                        <a href="<c:url value='/vagas?action=new'/>" class="btn btn-primary btn-sm">
                                             <i class="bi bi-plus"></i> Nova Vaga
                                         </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Charts -->
-                    <div class="row mt-4">
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Candidaturas por Status</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart-container">
-                                        <canvas id="statusChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Candidaturas nos Últimos 30 Dias</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart-container">
-                                        <canvas id="candidaturasChart"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -868,7 +864,7 @@
                             <div class="card h-100">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0">Últimos Usuários Registrados</h5>
-                                    <a href="<c:url value='/usuarios'/>" class="btn btn-sm btn-outline-primary">Ver Todos</a>
+                                    <a href="<c:url value='/usuario?action=listar'/>" class="btn btn-sm btn-outline-primary">Ver Todos</a>
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -889,8 +885,8 @@
                                                         <td>
                                                             <div class="d-flex align-items-center">
                                                                 <c:choose>
-                                                                    <c:when test="${not empty usuario.foto_perfil}">
-                                                                        <img src="<c:url value='${usuario.foto_perfil}'/>" alt="User" class="user-profile-img me-2">
+                                                                    <c:when test="${not empty usuario.fotoPerfil}">
+                                                                        <img src="<c:url value='/${usuario.fotoPerfil}'/>" alt="User" class="user-profile-img me-2">
                                                                     </c:when>
                                                                     <c:otherwise>
                                                                         <div class="user-profile-img bg-primary text-white d-flex align-items-center justify-content-center me-2">
@@ -912,7 +908,7 @@
                                                                 ${usuario.tipo}
                                                             </span>
                                                         </td>
-                                                        <td>${usuario.dataFormatada}</td>
+                                                        <td>${usuario.dataCadastro}</td>
                                                         <td>
                                                             <span class="badge 
                                                                 <c:choose>
@@ -922,8 +918,11 @@
                                                             </span>
                                                         </td>
                                                         <td>
-                                                            <a href="<c:url value='/usuario/editar?id=${usuario.id}'/>" class="btn btn-sm btn-outline-primary">
+                                                            <a href="<c:url value='/usuario?action=editar&id=${usuario.id}'/>" class="btn btn-sm btn-outline-primary">
                                                                 <i class="bi bi-pencil"></i>
+                                                            </a>
+                                                            <a href="<c:url value='/usuario?action=excluir&id=${usuario.id}'/>" class="btn btn-sm btn-outline-danger">
+                                                                <i class="bi bi-trash"></i>
                                                             </a>
                                                         </td>
                                                     </tr>
@@ -973,35 +972,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Charts -->
-                    <div class="row mt-4">
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Novos Usuários (Últimos 30 Dias)</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart-container">
-                                        <canvas id="usuariosChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Distribuição de Usuários</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart-container">
-                                        <canvas id="distribuicaoChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </c:when>
             </c:choose>
         </div>
@@ -1034,129 +1004,14 @@
         window.addEventListener('resize', adjustChartsForMobile);
         document.addEventListener('DOMContentLoaded', adjustChartsForMobile);
         
-        // Charts - Only render if they exist on the page
-        <c:if test="${usuarioLogado.tipo == 'EMPRESA' || usuarioLogado.tipo == 'ADMIN'}">
-            // Status Chart for Company
-            <c:if test="${usuarioLogado.tipo == 'EMPRESA'}">
-                const statusCtx = document.getElementById('statusChart')?.getContext('2d');
-                if (statusCtx) {
-                    new Chart(statusCtx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ${statusLabels},
-                            datasets: [{
-                                data: ${statusData},
-                                backgroundColor: [
-                                    'rgba(54, 162, 235, 0.7)',
-                                    'rgba(75, 192, 192, 0.7)',
-                                    'rgba(255, 206, 86, 0.7)',
-                                    'rgba(255, 99, 132, 0.7)',
-                                    'rgba(153, 102, 255, 0.7)'
-                                ],
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'right',
-                                }
-                            }
-                        }
-                    });
+        // Confirmação para ações críticas
+        document.querySelectorAll('[data-confirm]').forEach(element => {
+            element.addEventListener('click', function(e) {
+                if (!confirm(this.getAttribute('data-confirm'))) {
+                    e.preventDefault();
                 }
-                
-                // Candidaturas Chart for Company
-                const candidaturasCtx = document.getElementById('candidaturasChart')?.getContext('2d');
-                if (candidaturasCtx) {
-                    new Chart(candidaturasCtx, {
-                        type: 'line',
-                        data: {
-                            labels: ${candidaturasLabels},
-                            datasets: [{
-                                label: 'Candidaturas',
-                                data: ${candidaturasData},
-                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 2,
-                                tension: 0.4,
-                                fill: true
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: {
-                                    beginAtZero: true
-                                }
-                            }
-                        }
-                    });
-                }
-            </c:if>
-            
-            // Admin Charts
-            <c:if test="${usuarioLogado.tipo == 'ADMIN'}">
-                // Usuários Chart for Admin
-                const usuariosCtx = document.getElementById('usuariosChart')?.getContext('2d');
-                if (usuariosCtx) {
-                    new Chart(usuariosCtx, {
-                        type: 'bar',
-                        data: {
-                            labels: ${usuariosLabels},
-                            datasets: [{
-                                label: 'Novos Usuários',
-                                data: ${usuariosData},
-                                backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            scales: {
-                                y: {
-                                    beginAtZero: true
-                                }
-                            }
-                        }
-                    });
-                }
-                
-                // Distribuição Chart for Admin
-                const distribuicaoCtx = document.getElementById('distribuicaoChart')?.getContext('2d');
-                if (distribuicaoCtx) {
-                    new Chart(distribuicaoCtx, {
-                        type: 'pie',
-                        data: {
-                            labels: ${distribuicaoLabels},
-                            datasets: [{
-                                data: ${distribuicaoData},
-                                backgroundColor: [
-                                    'rgba(54, 162, 235, 0.7)',
-                                    'rgba(75, 192, 192, 0.7)',
-                                    'rgba(255, 206, 86, 0.7)'
-                                ],
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'right',
-                                }
-                            }
-                        }
-                    });
-                }
-            </c:if>
-        </c:if>
+            });
+        });
     </script>
 </body>
 </html>

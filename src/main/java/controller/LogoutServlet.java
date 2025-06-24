@@ -11,12 +11,24 @@ import javax.servlet.http.HttpSession;
 @WebServlet("/logout")
 public class LogoutServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        // Invalida a sessão atual
         HttpSession session = request.getSession(false);
+        
         if (session != null) {
+            // Remove todos os atributos da sessão
             session.invalidate();
         }
-        response.sendRedirect("login.jsp");
+        
+        // Redireciona para a página de login com mensagem de sucesso
+        response.sendRedirect(request.getContextPath() + "/login?logout=true");
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        // Chama o mesmo método do GET para garantir consistência
+        doGet(request, response);
     }
 }

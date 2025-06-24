@@ -68,22 +68,28 @@ public class Vagas {
         return vaga;
     }
 
-    public List<Vaga> listarTodas() {
-        String sql = "SELECT * FROM vaga";
-        List<Vaga> vagas = new ArrayList<>();
-        
-        try (Connection conexao = util.conexao.getConexao();
-             PreparedStatement stmt = conexao.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
-            while (rs.next()) {
-                vagas.add(criarVagaAPartirResultSet(rs));
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao listar vagas: " + e.getMessage());
+public List<Vaga> listarTodas() {
+    String sql = "SELECT v.*, u.nome AS nomeEmpresa FROM vaga v " +
+                 "JOIN usuario u ON v.empresa_id = u.id";
+    List<Vaga> vagas = new ArrayList<>();
+
+    try (Connection conexao = util.conexao.getConexao();
+         PreparedStatement stmt = conexao.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+
+        while (rs.next()) {
+            Vaga vaga = criarVagaAPartirResultSet(rs);
+            vaga.setNomeEmpresa(rs.getString("nomeEmpresa"));
+            vagas.add(vaga);
         }
-        return vagas;
+    } catch (SQLException e) {
+        System.err.println("Erro ao listar vagas: " + e.getMessage());
     }
+    return vagas;
+}
+
+
+
 
     public boolean atualizar(Vaga vaga) {
         String sql = "UPDATE vaga SET empresa_id = ?, titulo = ?, descricao = ?, requisitos = ?, " +
@@ -170,22 +176,31 @@ public class Vagas {
         return vagas;
     }
 
-    public List<Vaga> buscarAtivas() {
-        String sql = "SELECT * FROM vaga WHERE status = 'ABERTA'";
-        List<Vaga> vagas = new ArrayList<>();
-        
-        try (Connection conexao = util.conexao.getConexao();
-             PreparedStatement stmt = conexao.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
-            while (rs.next()) {
-                vagas.add(criarVagaAPartirResultSet(rs));
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao buscar vagas ativas: " + e.getMessage());
+ public List<Vaga> buscarAtivas() {
+    String sql = "SELECT v.*, u.nome AS empresa_nome " +
+                 "FROM vaga v " +
+                 "JOIN usuario u ON v.empresa_id = u.id " +
+                 "WHERE v.status = 'ABERTA' AND u.tipo = 'EMPRESA'";
+    List<Vaga> vagas = new ArrayList<>();
+
+    try (Connection conexao = util.conexao.getConexao();
+         PreparedStatement stmt = conexao.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+
+        while (rs.next()) {
+            Vaga vaga = criarVagaAPartirResultSet(rs);
+            vaga.setNomeEmpresa(rs.getString("empresa_nome")); // preenche o nome da empresa
+            vagas.add(vaga);
         }
-        return vagas;
+    } catch (SQLException e) {
+        System.err.println("Erro ao buscar vagas ativas: " + e.getMessage());
     }
+    return vagas;
+}
+
+    
+    
+   
 
     private Vaga criarVagaAPartirResultSet(ResultSet rs) throws SQLException {
         Vaga vaga = new Vaga();
